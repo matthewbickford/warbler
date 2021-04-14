@@ -15,7 +15,7 @@ from models import db, connect_db, Message, User
 # before we import our app, since that will have already
 # connected to the database
 
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
+os.environ['DATABASE_URL'] = "postgresql:///warbler_test"
 
 
 # Now we can import app
@@ -57,14 +57,14 @@ class MessageViewTestCase(TestCase):
         # Since we need to change the session to mimic logging in,
         # we need to use the changing-session trick:
 
-        with self.client as c:
-            with c.session_transaction() as sess:
-                sess[CURR_USER_KEY] = self.testuser.id
+        with self.client as client:
+            with client.session_transaction() as session:
+                session[CURR_USER_KEY] = self.testuser.id
 
             # Now, that session setting is saved, so we can have
             # the rest of ours test
 
-            resp = c.post("/messages/new", data={"text": "Hello"})
+            resp = client.post("/messages/new", data={"text": "Hello"})
 
             # Make sure it redirects
             self.assertEqual(resp.status_code, 302)
